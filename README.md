@@ -17,7 +17,7 @@ A simple desktop calculator built with Java Swing, styled after the classic iOS 
 
 ## Screenshot
 
-![Calculator screenshot](Images/calc2.png)
+![Calculator screenshot](Images/calc1.png) ![Calculator screenshot](Images/calc2.png)
 
 ## Requirements
 
