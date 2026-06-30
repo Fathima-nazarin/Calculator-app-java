@@ -1,8 +1,8 @@
-# Calculator
+# 🧮Calculator 
 
-A simple desktop calculator built with Java Swing, styled after the classic iOS calculator. It supports basic arithmetic out of the box, with an expandable scientific mode for trigonometric, logarithmic, and other advanced functions.
+A simple desktop calculator built using Java and Java Swing.  It features a clean, responsive UI with a built-in toggle to expand into a fully scientific calculator for trigonometric, logarithmic, and other advanced mathematical operations.
 
-## Features
+## ✨Features
 
 - Basic arithmetic: addition, subtraction, multiplication, division
 - Percentage and backspace support
@@ -15,9 +15,13 @@ A simple desktop calculator built with Java Swing, styled after the classic iOS 
   - `π`
 - Clean, dark-themed UI inspired by the iOS calculator
 
-## Screenshot
+## Screenshots
 
-![Calculator screenshot](Images/calc1.png)         ![Calculator screenshot](Images/calc2.png)
+<p align="center">
+  <img src="Images/calc1.png" alt="Calculator basic" width="250" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="Images/calc2.png" alt="Scientific Calculator" width="250" />
+</p>
 
 ## Requirements
 
