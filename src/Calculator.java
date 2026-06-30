@@ -13,49 +13,41 @@ public class Calculator{
     Color customLightGray = new Color(212,212,210);
     Color customDarkGray = new Color(80,80,80);
     Color customblack= new Color(28,28,28);
-    Color customOrange = new Color(255,149,0);
+    Color customOrange = new Color(255,100,90);
+    Color customSciColor= new Color(105,105,105);
     
     String[] buttonValues={
-        "AC", "+/-", "%", "÷",
-        "7", "8", "9" ,"x",
-        "4", "5","6","-",
+        "AC", "⌫", "%", "÷",
+        "7", "8", "9" ,"×",
+        "4", "5","6","–",
         "1","2", "3", "+",
-        "0", ".","✓", "="
+        "0", ".","+/-", "="
     };
-    String[] rightSymbols = {"÷","x","-","+","="};
-    String[] topSymbols = {"AC","+/-","%"};
+    String[] rightSymbols = {"÷","×","–","+","="};
+    String[] topSymbols = {"AC","⌫","%"};
+
+    String[] sciButtonValues = {
+        "sin", "cos", "tan", "√",
+        "ln", "log", "x²", "π"
+    };
+    
+    boolean isScientificMode = false;
+    int collapsedHeight = boardHeight;
+    int expandedHeight = boardHeight ;
+    
+    JPanel sciPanel = new JPanel();
+    JButton toggleSciButton = new JButton("ƒ(x)");
+    JPanel mainPanel = new JPanel();
 
     JFrame frame = new JFrame("Calculator");
     JLabel displayLabel=new JLabel();
     JPanel displayPanel=new JPanel();
     JPanel buttonsPanel=new JPanel();
+ 
 
     String A ="0";
     String operator =null;
     String B=null;
-
-
-    
-    class RoundedBorder implements Border {
-        private int radius;
-    
-        RoundedBorder(int radius) {
-            this.radius = radius;
-        }
-    
-        public Insets getBorderInsets(Component c) {
-            return new Insets(this.radius + 1, this.radius + 1, this.radius + 2, this.radius);
-        }
-    
-        public boolean isBorderOpaque() {
-            return true;
-        }
-    
-        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            // Draw the curved perimeter boundary
-            g.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
-        }
-    }
 
 
     Calculator(){
@@ -74,17 +66,35 @@ public class Calculator{
         displayLabel.setOpaque(true);
 
         displayPanel.setLayout(new BorderLayout());
-        displayPanel.add(displayLabel);
+        displayPanel.add(displayLabel, BorderLayout.CENTER);
+
+        toggleSciButton.setFocusable(false);
+        toggleSciButton.setFont(new Font("Ariel", Font.PLAIN, 16));
+        toggleSciButton.setBackground(customDarkGray);
+        toggleSciButton.setForeground(Color.white);
+        displayPanel.add(toggleSciButton, BorderLayout.NORTH);
+
         frame.add(displayPanel,BorderLayout.NORTH);
 
         buttonsPanel.setLayout(new GridLayout(5,4));
         buttonsPanel.setBackground(customblack);
-        frame.add(buttonsPanel);
 
-        for (int i = 0; i <= buttonValues.length; i++) {
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(buttonsPanel, BorderLayout.CENTER);
+        frame.add(mainPanel, BorderLayout.CENTER);
+ 
+        frame.add(displayPanel,BorderLayout.NORTH);
+        
+
+        for (int i = 0; i < buttonValues.length; i++) {
             JButton button = new JButton();
             String buttonValue = buttonValues[i];
-            button.setFont(new Font("Ariel",Font.PLAIN,30));
+            if(buttonValue=="⌫" || buttonValue=="AC"){
+                button.setFont(new Font("Ariel",Font.PLAIN,25));
+            }else if(Arrays.asList(rightSymbols).contains(buttonValue)){
+                button.setFont(new Font("Ariel",Font.PLAIN,34));
+            }
+            else{button.setFont(new Font("Ariel",Font.PLAIN,30));}
             button.setText(buttonValue);
             button.setFocusable(false);
             button.setContentAreaFilled(true); 
@@ -115,23 +125,16 @@ public class Calculator{
                                 B=displayLabel.getText();
                                 double a = Double.parseDouble(A);
                                 double b = Double.parseDouble(B);
-
-                                if(operator=="+"){
-                                    displayLabel.setText(removeZeroDecimal(a+b));
-                                
-                                }
-                                else if(operator=="-"){
-                                    displayLabel.setText(removeZeroDecimal(a-b));
-                                }
-                                else if(operator=="x"){
-                                    displayLabel.setText(removeZeroDecimal(a*b));
-                                }
-                                else if(operator=="÷"){
-                                    displayLabel.setText(removeZeroDecimal(a/b));
+                                switch(operator){
+                                    case "+" : displayLabel.setText(removeZeroDecimal(a+b));
+                                    case "–" : displayLabel.setText(removeZeroDecimal(a-b));
+                                    case "÷": displayLabel.setText(removeZeroDecimal(a/b));
+                                    case "×" : displayLabel.setText(removeZeroDecimal(a*b));
+                                    default: return;
                                 }
                             }
                         }
-                        else  if("+-x÷".contains(buttonValue)){
+                        else if("÷×–+".contains(buttonValue)){
                             if(operator==null){
                                 A=displayLabel.getText();
                                 displayLabel.setText("0");
@@ -146,10 +149,10 @@ public class Calculator{
                             displayLabel.setText("0");
 
                         }
-                        else if(buttonValue== "+/-"){
-                            double numDisplay = Double.parseDouble(displayLabel.getText());
-                            numDisplay*= -1;
-                            displayLabel.setText(removeZeroDecimal(numDisplay));
+                        else if(buttonValue== "⌫"){
+                            int num = Integer.parseInt(displayLabel.getText());
+                            num/=10;
+                            displayLabel.setText(Integer.toString(num));
 
                         } else if(buttonValue== "%"){
                             double numDisplay = Double.parseDouble(displayLabel.getText());
@@ -174,10 +177,11 @@ public class Calculator{
                                 displayLabel.setText(displayLabel.getText() +buttonValue);
                             }
                         }
-                        else if(buttonValue== "✓"){ 
-                            double squareRoot = Double.parseDouble(displayLabel.getText());
-                            double ans= Math.pow(squareRoot,0.5);
-                            displayLabel.setText(removeZeroDecimal(ans));
+                        else if(buttonValue== "+/-"){ 
+                            double numDisplay = Double.parseDouble(displayLabel.getText());
+                            numDisplay*= -1;
+                            displayLabel.setText(removeZeroDecimal(numDisplay));
+                            
                         }
                     }
                 }
@@ -185,6 +189,53 @@ public class Calculator{
 
         frame.setVisible(true);
         }
+        sciPanel.setLayout(new GridLayout(2,4));
+        sciPanel.setBackground(customblack);
+
+        for (String sciValue : sciButtonValues) {
+            JButton sciButton = new JButton(sciValue);
+            sciButton.setFont(new Font("Ariel", Font.PLAIN, 22));
+            sciButton.setFocusable(false);
+            sciButton.setBackground(customSciColor);
+            sciButton.setForeground(Color.WHITE);
+            sciButton.setBorder(new LineBorder(customblack));
+            sciPanel.add(sciButton);
+
+            sciButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    double num = Double.parseDouble(displayLabel.getText());
+                    double result;
+                    switch (sciValue) {
+                        case "sin": result = Math.sin(Math.toRadians(num)); break;
+                        case "cos": result = Math.cos(Math.toRadians(num)); break;
+                        case "tan": result = Math.tan(Math.toRadians(num)); break;
+                        case "√":   result = Math.sqrt(num); break;
+                        case "ln":  result = Math.log(num); break;
+                        case "log": result = Math.log10(num); break;
+                        case "x²":  result = Math.pow(num, 2); break;
+                        case "π":   result = Math.PI; break;
+                        default: return;
+                    }
+                    displayLabel.setText(removeZeroDecimal(result));
+                    
+                }
+            });
+        }
+        toggleSciButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                isScientificMode = !isScientificMode;
+                if (isScientificMode) {
+                    mainPanel.add(sciPanel, BorderLayout.NORTH);
+                    frame.setSize(boardWidth, expandedHeight);
+                } else {
+                    mainPanel.remove(sciPanel);
+                    frame.setSize(boardWidth, collapsedHeight);
+                }
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+        
         
 
     }
@@ -193,6 +244,7 @@ public class Calculator{
         operator=null;
         B=null;
     }
+
     String removeZeroDecimal(double numDisplay){
         if(numDisplay%1 == 0){
             return Integer.toString((int) numDisplay);
